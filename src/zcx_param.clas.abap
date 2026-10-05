@@ -1,5 +1,5 @@
-"! Exception ที่ raise เมื่อหา parameter ใน ZTBC_PARAM ไม่เจอ
-"! (เฉพาะตอนเรียกด้วย IV_RAISE_IF_MISSING = ABAP_TRUE)
+"! Exception ที่ ZCL_PARAM raise เมื่ออ่านค่าจาก ZTBC_PARAM ไม่ได้
+"! สาเหตุดูได้จาก GV_REASON ค่าที่เป็นไปได้อยู่ใน GC_REASON
 CLASS zcx_param DEFINITION
   PUBLIC
   INHERITING FROM cx_static_check
@@ -9,9 +9,15 @@ CLASS zcx_param DEFINITION
   PUBLIC SECTION.
 
     CONSTANTS:
+      "! สาเหตุของ exception เก็บไว้ใน GV_REASON
       BEGIN OF gc_reason,
+        "! ไม่พบ record ตามเงื่อนไขที่ระบุ
         not_found     TYPE string VALUE 'NOT_FOUND',
+
+        "! record ที่จะใช้เป็น range ไม่ได้ระบุ PARAM_SIGN / PARAM_OPTION
         invalid_param TYPE string VALUE 'INVALID_PARAM',
+
+        "! แปลง LOW_VALUE เป็น type ของตัวแปรที่ caller ส่งมาไม่ได้
         invalid_type  TYPE string VALUE 'INVALID_TYPE',
       END OF gc_reason.
 
@@ -24,6 +30,14 @@ CLASS zcx_param DEFINITION
     DATA gv_param_ext  TYPE ztbc_param-param_ext  READ-ONLY.
     DATA gv_sequence   TYPE ztbc_param-sequence   READ-ONLY.
 
+    "! สร้าง exception พร้อม key ของ record ที่มีปัญหา
+    "! @parameter textid        | Text ID มาตรฐานของ exception class
+    "! @parameter previous      | exception ต้นเหตุ เช่น conversion error
+    "! @parameter iv_reason     | สาเหตุ ค่าจาก GC_REASON
+    "! @parameter iv_app_id     | Application ID ของ record ที่มีปัญหา
+    "! @parameter iv_param_name | Parameter name ของ record ที่มีปัญหา
+    "! @parameter iv_param_ext  | Additional parameter ของ record ที่มีปัญหา
+    "! @parameter iv_sequence   | Sequence no. ของ record ที่มีปัญหา
     METHODS constructor
       IMPORTING textid        LIKE textid                OPTIONAL
                 previous      LIKE previous              OPTIONAL
@@ -66,7 +80,8 @@ CLASS ZCX_PARAM IMPLEMENTATION.
       WHEN gv_reason = gc_reason-invalid_type
         THEN |Invalid parameter type|
       WHEN gv_reason = gc_reason-not_found
-        THEN |No constant parameter found| ).
+        THEN |No constant parameter found|
+      ELSE |Constant parameter error| ).
 
     result = |{ result }: APP_ID={ gv_app_id }, PARAM_NAME={ gv_param_name }|.
 

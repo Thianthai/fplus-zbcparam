@@ -6,14 +6,20 @@ CLASS zcl_param DEFINITION
 
   PUBLIC SECTION.
 
-    TYPES: BEGIN OF ty_range_value,
-             sign   TYPE ddsign,
-             option TYPE ddoption,
-             low    TYPE ztbc_param-low_value,
-             high   TYPE ztbc_param-high_value,
-           END OF ty_range_value.
+    TYPES:
+      "! 1 บรรทัดของ range table
+      "! ชื่อ component ตรงกับ RANGE OF / SELECT-OPTIONS มาตรฐาน
+      BEGIN OF ty_range_value,
+        sign   TYPE ddsign,
+        option TYPE ddoption,
+        low    TYPE ztbc_param-low_value,
+        high   TYPE ztbc_param-high_value,
+      END OF ty_range_value.
 
+    "! record ของ ZTBC_PARAM ทั้งแถว
     TYPES tt_param       TYPE STANDARD TABLE OF ztbc_param WITH EMPTY KEY.
+    "! range table สำเร็จรูป
+    "! ใช้รับค่าจาก GET_RANGE ได้เลย ถ้าไม่อยากประกาศ RANGE OF เอง
     TYPES tt_range_value TYPE STANDARD TABLE OF ty_range_value WITH EMPTY KEY.
 
     "! record ที่ pre-select ไว้ตอนสร้าง object — อ่านได้จากภายนอก แก้ไม่ได้
@@ -50,12 +56,19 @@ CLASS zcl_param DEFINITION
       EXPORTING ev_value        TYPE any
       RAISING   zcx_param.
 
-    "! @parameter iv_company_code   | Company code (ไม่ส่ง = ไม่นำไปกรอง)
-    "! @parameter iv_module_id      | Module (ไม่ส่ง = ไม่นำไปกรอง)
-    "! @parameter iv_app_id         | Application ID
-    "! @parameter iv_param_name     | Parameter name
-    "! @parameter iv_param_ext      | Additional parameter (ไม่ส่ง = ไม่นำไปกรอง)
-    "! @parameter et_range          | LOW_VALUE + HIGH_VALUE ของทุก record ที่ตรงเงื่อนไข
+    "! อ่านค่าเป็น range table จาก buffer เรียงตาม SEQUENCE
+    "! SIGN / OPTION มาจาก PARAM_SIGN / PARAM_OPTION
+    "! LOW / HIGH มาจาก LOW_VALUE / HIGH_VALUE
+    "! @parameter iv_company_code | Company code (ไม่ส่ง = ไม่นำไปกรอง)
+    "! @parameter iv_module_id    | Module (ไม่ส่ง = ไม่นำไปกรอง)
+    "! @parameter iv_app_id       | Application ID
+    "! @parameter iv_param_name   | Parameter name
+    "! @parameter iv_param_ext    | Additional parameter (ไม่ส่ง = ไม่นำไปกรอง)
+    "! @parameter iv_sequence     | Sequence no. (ไม่ส่ง = ไม่นำไปกรอง)
+    "! @parameter et_range        | range table ของ caller<br/>
+    "!                              จะเป็น RANGE OF ... หรือ TT_RANGE_VALUE ก็ได้
+    "! @raising   zcx_param       | NOT_FOUND -> ไม่พบ record ตามเงื่อนไข<br/>
+    "!                              INVALID_PARAM -> มี record ที่ไม่ได้ระบุ PARAM_SIGN / PARAM_OPTION
     METHODS get_range
       IMPORTING iv_company_code TYPE ztbc_param-company_code OPTIONAL
                 iv_module_id    TYPE ztbc_param-module_id    OPTIONAL
@@ -229,7 +242,8 @@ CLASS ZCL_PARAM IMPLEMENTATION.
 
       CATCH cx_sy_conversion_error INTO DATA(lx_conversion).
         RAISE EXCEPTION TYPE zcx_param
-          EXPORTING iv_reason     = zcx_param=>gc_reason-invalid_type
+          EXPORTING previous      = lx_conversion
+                    iv_reason     = zcx_param=>gc_reason-invalid_type
                     iv_app_id     = iv_app_id
                     iv_param_name = iv_param_name
                     iv_param_ext  = iv_param_ext
