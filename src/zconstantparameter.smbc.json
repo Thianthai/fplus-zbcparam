@@ -1,0 +1,39 @@
+{
+  "formatVersion": "1",
+  "header": {
+    "description": "Maintain Constant Parameter",
+    "originalLanguage": "en",
+    "abapLanguageVersion": "cloudDevelopment"
+  },
+  "serviceConfiguration": {
+    "serviceBinding": "ZUI_CONSTANTPARAMETER_O4",
+    "serviceName": "ZUI_CONSTANTPARAMETER_O4",
+    "serviceVersion": "0001",
+    "rootEntitySet": "ConstantParameteAll",
+    "name": "Constant Parameter",
+    "transportObject": "ZCONSTANTPARAMETERT",
+    "configurationGroup": "",
+    "skipRootEntity": true
+  },
+  "appConfiguration": {
+    "listReport": {},
+    "objectPages": [
+      {
+        "entitySet": "ConstantParameteAll",
+        "variantManagement": "control",
+        "showTransportSelectionStrip": true
+      }
+    ],
+    "tableSettings": [
+      {
+        "entitySet": "ConstantParameter",
+        "selectAll": true,
+        "rowCountMode": "auto",
+        "frozenColumnCount": 7,
+        "threshold": 20,
+        "creationModeName": "inlineCreationRows",
+        "enableFullScreen": true
+      }
+    ]
+  }
+}

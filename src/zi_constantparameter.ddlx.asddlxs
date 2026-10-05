@@ -1,0 +1,144 @@
+@Metadata.layer: #CUSTOMER
+@UI: {
+  headerInfo: {
+    typeName: 'Constant Parameter', 
+    typeNamePlural: 'Constant Parameters', 
+    title: {
+      type: #STANDARD, 
+      value: 'CompanyCode'
+    }
+  }
+}
+annotate view ZI_ConstantParameter with
+{
+  @UI.identification: [ {
+    position: 1 
+  } ]
+  @UI.lineItem: [ {
+    position: 1 
+  } ]
+  @UI.facet: [ {
+    id: 'ConstantParameter', 
+    purpose: #STANDARD, 
+    type: #IDENTIFICATION_REFERENCE, 
+    label: 'Constant Parameter', 
+    position: 1 
+  } ]
+  CompanyCode;
+  
+  @UI.identification: [ {
+    position: 2 
+  } ]
+  @UI.lineItem: [ {
+    position: 2 
+  } ]
+  ModuleId;
+  
+  @UI.identification: [ {
+    position: 3 
+  } ]
+  @UI.lineItem: [ {
+    position: 3 
+  } ]
+  AppId;
+  
+  @UI.identification: [ {
+    position: 4 
+  } ]
+  @UI.lineItem: [ {
+    position: 4 
+  } ]
+  ParamName;
+  
+  @UI.identification: [ {
+    position: 5 
+  } ]
+  @UI.lineItem: [ {
+    position: 5 
+  } ]
+  ParamExt;
+  
+  @UI.identification: [ {
+    position: 6 
+  } ]
+  @UI.lineItem: [ {
+    position: 6 
+  } ]
+  Sequence;
+  
+  @UI.identification: [ {
+    position: 7 
+  } ]
+  @UI.lineItem: [ {
+    position: 7 
+  } ]
+  EndDate;
+  
+  @UI.identification: [ {
+    position: 8 
+  } ]
+  @UI.lineItem: [ {
+    position: 8 
+  } ]
+  StartDate;
+  
+  @UI.identification: [ {
+    position: 9 
+  } ]
+  @UI.lineItem: [ {
+    position: 9 
+  } ]
+  ParamSign;
+  
+  @UI.identification: [ {
+    position: 10 
+  } ]
+  @UI.lineItem: [ {
+    position: 10 
+  } ]
+  ParamOption;
+  
+  @UI.identification: [ {
+    position: 11 
+  } ]
+  @UI.lineItem: [ {
+    position: 11
+  } ]
+  LowValue;
+  
+  @UI.identification: [ {
+    position: 12 
+  } ]
+  @UI.lineItem: [ {
+    position: 12 
+  } ]
+  HighValue;
+  
+  @UI.identification: [ {
+    position: 13 
+  } ]
+  @UI.lineItem: [ {
+    position: 13 
+  } ]
+  ParamDesc;
+
+  @UI.identification: [ {
+    position: 14
+  } ]
+  CreatedBy;
+  
+  @UI.identification: [ {
+    position: 15
+  } ]
+  CreatedAt;
+  
+  @UI.identification: [ {
+    position: 16 
+  } ]
+  LastChangedBy;
+  
+  @UI.identification: [ {
+    position: 17 
+  } ]
+  LastChangedAt;
+}

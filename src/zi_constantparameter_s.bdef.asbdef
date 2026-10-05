@@ -1,0 +1,127 @@
+managed with additional save implementation in class ZBP_I_CONSTANTPARAMETER_S unique;
+strict ( 1 );
+with draft;
+define behavior for ZI_ConstantParameter_S alias ConstantParameteAll
+draft table ZTBC_PARAM_D_S
+with unmanaged save
+lock master total etag LastChangedAtMax
+authorization master( global )
+{
+  field ( readonly )
+   SingletonID;
+
+  field ( features : instance )
+   TransportRequestID;
+
+  field ( notrigger )
+   SingletonID,
+   LastChangedAtMax;
+
+
+  update;
+  internal create;
+  internal delete;
+
+  draft action ( features : instance ) Edit with additional implementation;
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare {
+    validation ConstantParameter ~ ValidateDataConsistency;
+  }
+  action ( features : instance ) SelectCustomizingTransptReq parameter D_SelectCustomizingTransptReqP result [1] $self;
+
+  association _ConstantParameter { create ( features : instance ); with draft; }
+
+  validation ValidateTransportRequest on save ##NOT_ASSIGNED_TO_DETACT
+  {
+    create;
+    update;
+  }
+
+  side effects
+  {
+    action SelectCustomizingTransptReq affects
+        $self;
+  }
+
+}
+
+define behavior for ZI_ConstantParameter alias ConstantParameter ##UNMAPPED_FIELD[SingletonID]
+persistent table ZTBC_PARAM
+draft table ZTBC_PARAM_D
+lock dependent by _ConstantParameteAll
+authorization dependent by _ConstantParameteAll
+{
+  field ( mandatory : create )
+   //CompanyCode,
+   //ModuleId,
+   AppId,
+   ParamName,
+   //ParamExt,
+   Sequence,
+   EndDate;
+
+  field ( readonly )
+   SingletonID,
+   CreatedBy,
+   CreatedAt,
+   LastChangedBy,
+   LastChangedAt;
+
+  field ( readonly : update )
+   CompanyCode,
+   ModuleId,
+   AppId,
+   ParamName,
+   ParamExt,
+   Sequence,
+   EndDate;
+
+  field ( notrigger )
+   SingletonID,
+   CreatedBy,
+   CreatedAt,
+   LastChangedBy,
+   LastChangedAt;
+
+
+  update( features : global );
+  delete( features : global );
+
+  mapping for ZTBC_PARAM
+  {
+    CompanyCode = COMPANY_CODE;
+    ModuleId = MODULE_ID;
+    AppId = APP_ID;
+    ParamName = PARAM_NAME;
+    ParamExt = PARAM_EXT;
+    Sequence = SEQUENCE;
+    EndDate = END_DATE;
+    StartDate = START_DATE;
+    ParamSign = PARAM_SIGN;
+    ParamOption = PARAM_OPTION;
+    LowValue = LOW_VALUE;
+    HighValue = HIGH_VALUE;
+    ParamDesc = PARAM_DESC;
+    CreatedBy = CREATED_BY;
+    CreatedAt = CREATED_AT;
+    LastChangedBy = LAST_CHANGED_BY;
+    LastChangedAt = LAST_CHANGED_AT;
+  }
+
+  association _ConstantParameteAll { with draft; }
+
+  validation ValidateTransportRequest on save ##NOT_ASSIGNED_TO_DETACT
+  {
+    create;
+    update;
+    delete;
+  }
+  validation ValidateDataConsistency on save
+  {
+    create;
+    update;
+  }
+
+}

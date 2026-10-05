@@ -1,0 +1,5 @@
+@ObjectModel.leadingEntity.name: 'ZI_ConstantParameter_S'
+define service ZUI_CONSTANTPARAMETER {
+  expose ZI_CONSTANTPARAMETER_S as ConstantParameteAll;
+  expose ZI_CONSTANTPARAMETER as ConstantParameter;
+}
