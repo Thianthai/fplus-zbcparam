@@ -40,12 +40,18 @@ CLASS zcl_param DEFINITION
       IMPORTING iv_text        TYPE clike
       RETURNING VALUE(rv_text) TYPE string.
 
-    "! @parameter iv_company_code   | Company code (ไม่ส่ง = ไม่นำไปกรอง)
-    "! @parameter iv_module_id      | Module (ไม่ส่ง = ไม่นำไปกรอง)
-    "! @parameter iv_app_id         | Application ID
-    "! @parameter iv_param_name     | Parameter name
-    "! @parameter iv_param_ext      | Additional parameter (ไม่ส่ง = ไม่นำไปกรอง)
-    "! @parameter ev_value          | LOW_VALUE ของ record แรกที่ตรงเงื่อนไข (ว่างถ้าไม่พบ)
+    "! อ่านค่าเดี่ยวจาก buffer
+    "! ได้ LOW_VALUE ของ record แรกที่ตรงเงื่อนไข ซึ่งคือ SEQUENCE ต่ำสุด
+    "! @parameter iv_company_code | Company code (ไม่ส่ง = ไม่นำไปกรอง)
+    "! @parameter iv_module_id    | Module (ไม่ส่ง = ไม่นำไปกรอง)
+    "! @parameter iv_app_id       | Application ID
+    "! @parameter iv_param_name   | Parameter name
+    "! @parameter iv_param_ext    | Additional parameter (ไม่ส่ง = ไม่นำไปกรอง)
+    "! @parameter iv_sequence     | Sequence no. (ไม่ส่ง = ไม่นำไปกรอง)
+    "! @parameter ev_value        | ตัวแปรของ caller ประกาศ type อะไรก็ได้<br/>
+    "!                              ระบบแปลง LOW_VALUE เป็น type นั้นให้ตอน assign
+    "! @raising   zcx_param       | NOT_FOUND -> ไม่พบ record ตามเงื่อนไข<br/>
+    "!                              INVALID_TYPE -> แปลง LOW_VALUE เป็น type ของ EV_VALUE ไม่ได้
     METHODS get_value
       IMPORTING iv_company_code TYPE ztbc_param-company_code OPTIONAL
                 iv_module_id    TYPE ztbc_param-module_id    OPTIONAL
