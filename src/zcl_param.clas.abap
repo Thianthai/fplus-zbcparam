@@ -34,12 +34,6 @@ CLASS zcl_param DEFINITION
                 iv_module_id       TYPE ztbc_param-module_id    OPTIONAL
       RETURNING VALUE(ro_instance) TYPE REF TO zcl_param.
 
-    "! ลบ invisible character (NBSP, zero-width space, BOM, ideographic space)
-    "! ที่อาจติดมาจากการ copy-paste จาก Excel / Word / web
-    CLASS-METHODS sanitize
-      IMPORTING iv_text        TYPE clike
-      RETURNING VALUE(rv_text) TYPE string.
-
     "! อ่านค่าเดี่ยวจาก buffer
     "! ได้ LOW_VALUE ของ record แรกที่ตรงเงื่อนไข ซึ่งคือ SEQUENCE ต่ำสุด
     "! @parameter iv_company_code | Company code (ไม่ส่ง = ไม่นำไปกรอง)
@@ -115,7 +109,6 @@ ENDCLASS.
 
 CLASS ZCL_PARAM IMPLEMENTATION.
 
-
   METHOD create_instance.
 
     " ต้องแยกเคสตาม IS SUPPLIED
@@ -181,11 +174,11 @@ CLASS ZCL_PARAM IMPLEMENTATION.
 
     " normalize buffer หนึ่งครั้ง -> LOOP WHERE / table expression ข้างล่างใช้ได้ตรง ๆ
     LOOP AT gt_param ASSIGNING FIELD-SYMBOL(<ls_param>).
-      <ls_param>-company_code = sanitize( <ls_param>-company_code ).
-      <ls_param>-module_id    = sanitize( <ls_param>-module_id ).
-      <ls_param>-app_id       = sanitize( <ls_param>-app_id ).
-      <ls_param>-param_name   = sanitize( <ls_param>-param_name ).
-      <ls_param>-param_ext    = sanitize( <ls_param>-param_ext ).
+      <ls_param>-company_code = zcl_utility=>remove_invisible_char( <ls_param>-company_code ).
+      <ls_param>-module_id    = zcl_utility=>remove_invisible_char( <ls_param>-module_id ).
+      <ls_param>-app_id       = zcl_utility=>remove_invisible_char( <ls_param>-app_id ).
+      <ls_param>-param_name   = zcl_utility=>remove_invisible_char( <ls_param>-param_name ).
+      <ls_param>-param_ext    = zcl_utility=>remove_invisible_char( <ls_param>-param_ext ).
     ENDLOOP.
 
   ENDMETHOD.
@@ -309,16 +302,4 @@ CLASS ZCL_PARAM IMPLEMENTATION.
 
   ENDMETHOD.
 
-
-  METHOD sanitize.
-
-    rv_text = iv_text.
-
-    " U+00A0 NBSP · U+200B-200D zero-width · U+FEFF BOM · U+3000 ideographic space
-    REPLACE ALL OCCURRENCES OF PCRE `[\x{00A0}\x{200B}-\x{200D}\x{FEFF}\x{3000}]`
-    IN rv_text WITH ` `.
-
-    rv_text = condense( rv_text ).
-
-  ENDMETHOD.
 ENDCLASS.
