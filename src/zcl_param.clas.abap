@@ -34,8 +34,8 @@ CLASS zcl_param DEFINITION
                 iv_module_id       TYPE ztbc_param-module_id    OPTIONAL
       RETURNING VALUE(ro_instance) TYPE REF TO zcl_param.
 
-    "! ล้าง invisible character (NBSP, zero-width space, BOM, ideographic space)
-    "! ที่มักติดมาจากการ copy-paste จาก Excel / Word / web
+    "! ลบ invisible character (NBSP, zero-width space, BOM, ideographic space)
+    "! ที่อาจติดมาจากการ copy-paste จาก Excel / Word / web
     CLASS-METHODS sanitize
       IMPORTING iv_text        TYPE clike
       RETURNING VALUE(rv_text) TYPE string.
@@ -48,9 +48,9 @@ CLASS zcl_param DEFINITION
     "! @parameter iv_param_name   | Parameter name
     "! @parameter iv_param_ext    | Additional parameter (ไม่ส่ง = ไม่นำไปกรอง)
     "! @parameter iv_sequence     | Sequence no. (ไม่ส่ง = ไม่นำไปกรอง)
-    "! @parameter ev_value        | ตัวแปรของ caller ประกาศ type อะไรก็ได้<br/>
+    "! @parameter ev_value        | ตัวแปรของ caller ประกาศ type อะไรก็ได้
     "!                              ระบบแปลง LOW_VALUE เป็น type นั้นให้ตอน assign
-    "! @raising   zcx_param       | NOT_FOUND -> ไม่พบ record ตามเงื่อนไข<br/>
+    "! @raising   zcx_param       | NOT_FOUND -> ไม่พบ record ตามเงื่อนไข
     "!                              INVALID_TYPE -> แปลง LOW_VALUE เป็น type ของ EV_VALUE ไม่ได้
     METHODS get_value
       IMPORTING iv_company_code TYPE ztbc_param-company_code OPTIONAL
@@ -71,9 +71,9 @@ CLASS zcl_param DEFINITION
     "! @parameter iv_param_name   | Parameter name
     "! @parameter iv_param_ext    | Additional parameter (ไม่ส่ง = ไม่นำไปกรอง)
     "! @parameter iv_sequence     | Sequence no. (ไม่ส่ง = ไม่นำไปกรอง)
-    "! @parameter et_range        | range table ของ caller<br/>
+    "! @parameter et_range        | range table ของ caller
     "!                              จะเป็น RANGE OF ... หรือ TT_RANGE_VALUE ก็ได้
-    "! @raising   zcx_param       | NOT_FOUND -> ไม่พบ record ตามเงื่อนไข<br/>
+    "! @raising   zcx_param       | NOT_FOUND -> ไม่พบ record ตามเงื่อนไข
     "!                              INVALID_PARAM -> มี record ที่ไม่ได้ระบุ PARAM_SIGN / PARAM_OPTION
     METHODS get_range
       IMPORTING iv_company_code TYPE ztbc_param-company_code OPTIONAL
@@ -118,8 +118,8 @@ CLASS ZCL_PARAM IMPLEMENTATION.
 
   METHOD create_instance.
 
-    " ต้องแยกเคสตาม IS SUPPLIED — ถ้าส่งต่อทุกตัวเสมอ constructor จะมองว่า
-    " "ส่งมาแล้วแต่ค่าว่าง" แล้วเอาค่าว่างไปใส่ range ทำให้ผลลัพธ์เพี้ยน
+    " ต้องแยกเคสตาม IS SUPPLIED
+    " ถ้าส่งต่อทุกตัวเสมอ constructor จะมองว่า ส่งมาแล้วแต่ค่าว่าง แล้วเอาค่าว่างไปใส่ range ทำให้ผลลัพธ์ไม่ถูกต้อง
     IF iv_company_code IS SUPPLIED AND iv_module_id IS SUPPLIED.
       ro_instance = NEW zcl_param( iv_company_code = iv_company_code
                                    iv_module_id    = iv_module_id ).
@@ -145,7 +145,8 @@ CLASS ZCL_PARAM IMPLEMENTATION.
     DATA lv_current_date TYPE d.
     DATA lv_current_time TYPE t.
 
-    " ส่งมาเฉพาะตัวไหน ก็ใส่ range เฉพาะตัวนั้น · range ว่าง = ไม่ถูกนำไปกรอง
+    " ส่งมาเฉพาะตัวไหน ก็ใส่ range เฉพาะตัวนั้น
+    " range ว่าง = ไม่ถูกนำไปกรอง
     IF iv_company_code IS SUPPLIED.
       lr_company_code = VALUE #( ( sign = 'I' option = 'EQ' low = iv_company_code ) ).
     ENDIF.
@@ -285,7 +286,7 @@ CLASS ZCL_PARAM IMPLEMENTATION.
 
     LOOP AT lt_param INTO DATA(ls_param).
 
-      " ไม่เดาค่าให้ — maintain ไม่ครบ = config ผิด ต้องรู้ว่า record ไหน
+      " maintain ไม่ครบ = config ผิด ต้องรู้ว่า record ไหน
       IF ls_param-param_sign IS INITIAL OR ls_param-param_option IS INITIAL.
         RAISE EXCEPTION TYPE zcx_param
           EXPORTING iv_reason     = zcx_param=>gc_reason-invalid_param
@@ -315,7 +316,7 @@ CLASS ZCL_PARAM IMPLEMENTATION.
 
     " U+00A0 NBSP · U+200B-200D zero-width · U+FEFF BOM · U+3000 ideographic space
     REPLACE ALL OCCURRENCES OF PCRE `[\x{00A0}\x{200B}-\x{200D}\x{FEFF}\x{3000}]`
-            IN rv_text WITH ` `.
+    IN rv_text WITH ` `.
 
     rv_text = condense( rv_text ).
 
