@@ -17,7 +17,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_param_demo IMPLEMENTATION.
+CLASS ZCL_PARAM_DEMO IMPLEMENTATION.
 
 
   METHOD if_oo_adt_classrun~main.
